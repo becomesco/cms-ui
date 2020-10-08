@@ -72,7 +72,7 @@
         if (media) {
           const buffer: Buffer = await GeneralService.errorWrapper(
             async () => {
-              return await sdk.media.getBinary(media._id);
+              return await sdk.media.getBinary(media._id, 'small');
             },
             async (value: Buffer) => {
               return value;

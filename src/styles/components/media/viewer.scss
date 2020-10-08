@@ -93,7 +93,8 @@
       color: var(--c-gray-light);
       text-align: center;
       img {
-        width: 100%;
+        // width: 100%;
+        max-width: 100px;
         cursor: pointer;
       }
     }

@@ -1,6 +1,6 @@
 {
   "name": "@becomes/cms-ui",
-  "version": "2.0.9",
+  "version": "2.0.12",
   "description": "BCMS UI.",
   "author": "becomes.co",
   "scripts": {
@@ -12,13 +12,13 @@
     "bundle": "node tools.js --bundle",
     "link": "node tools.js --link",
     "unlink": "node tools.js --unlink",
-    "publish": "node tools.js --publish"
+    "publish:dist": "node tools.js --publish"
   },
   "devDependencies": {
     "fs-extra": "^9.0.1"
   },
   "dependencies": {
-    "@becomes/cms-sdk": "^1.0.3",
+    "@becomes/cms-sdk": "^1.0.4",
     "@rollup/plugin-commonjs": "^14.0.0",
     "@rollup/plugin-node-resolve": "^8.0.0",
     "@rollup/plugin-typescript": "^4.0.0",

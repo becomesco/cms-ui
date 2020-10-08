@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, beforeUpdate } from 'svelte';
   import type {
     APIFunction,
     ApiKey,
@@ -22,16 +22,16 @@
 
   export let id: string = undefined;
 
+  type ApiFuntionModified = {
+    selected: boolean;
+  } & APIFunction;
+
   const keyStoreUnsub = StoreService.subscribe(
     'apiKey',
     async (value: ApiKey[]) => {
       if (value) {
         keys = value;
-        if (key) {
-          key = keys.find((e) => e._id === key._id);
-        } else {
-          key = keys[0];
-        }
+        key = keys.find((e) => e._id === id);
       }
     }
   );
@@ -52,10 +52,16 @@
       } else {
         id = tempId;
         key = keys.find((e) => e._id === id);
+        if (!key) {
+          key = keys[0];
+        }
       }
     }
   });
-  let apiFunctions: APIFunction[] = [];
+  const buffer = {
+    id: '',
+  };
+  let apiFunctions: ApiFuntionModified[] = [];
   let templates: Template[] = [];
   let keys: ApiKey[] = [];
   let key: ApiKey;
@@ -168,7 +174,10 @@
     }
     key.access.templates = [...key.access.templates, data];
   }
-  function setKeyFunctionPolicy(data: { fn: APIFunction; value: boolean }) {
+  function setKeyFunctionPolicy(data: {
+    fn: ApiFuntionModified;
+    value: boolean;
+  }) {
     if (data.value) {
       key.access.functions = [...key.access.functions, { name: data.fn._id }];
     } else {
@@ -178,10 +187,35 @@
     }
   }
 
+  beforeUpdate(async () => {
+    if (buffer.id !== id) {
+      buffer.id = id;
+      apiFunctions.forEach((fn) => {
+        if (!fn.public) {
+          if (key.access.functions.find((e) => e.name === fn._id)) {
+            fn.selected = true;
+          } else {
+            fn.selected = false;
+          }
+        }
+      });
+    }
+  });
+
   onMount(async () => {
-    apiFunctions = await sdk.apiFunction.getAll();
+    apiFunctions = (await sdk.apiFunction.getAll()).map((e) => {
+      return {
+        _id: e._id,
+        public: e.public,
+        selected: e.public ? true : false,
+      };
+    });
     StoreService.update('apiKey', await sdk.apiKey.getAll());
     StoreService.update('template', await sdk.template.getAll());
+    if (!id || id === '-') {
+      key = keys[0];
+      GeneralService.navigate(`/dashboard/key/editor/${keys[0]._id}`);
+    }
   });
   onDestroy(() => {
     templateStoreUnsub();
@@ -249,7 +283,7 @@
             {#each apiFunctions as fn}
               <FNPolicy
                 title={fn._id}
-                checked={key.access.functions.find((e) => e.name === fn._id) ? true : false}
+                checked={!!key.access.functions.find((e) => e.name === fn._id)}
                 initialValue={fn}
                 on:change={(event) => {
                   setKeyFunctionPolicy({ fn, value: event.detail });

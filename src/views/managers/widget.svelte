@@ -139,6 +139,7 @@
     StoreService.update('widget', await sdk.widget.getAll());
     if (!id || id === '-') {
       widget = widgets[0];
+      GeneralService.navigate(`/dashboard/widget/editor/${widgets[0]._id}`);
     } else {
       widget = widgets.find((e) => e._id === id);
     }

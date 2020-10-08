@@ -126,7 +126,7 @@
         if (cached) {
           return { fromCache: true, b64: cached.b64 };
         }
-        return { fromCache: false, b64: await sdk.media.getBinary(media._id) };
+        return { fromCache: false, b64: await sdk.media.getBinary(media._id, 'small') };
       },
       async (data: { fromCache: boolean; b64: string | Buffer }) => {
         let b64: string;

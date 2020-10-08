@@ -119,6 +119,14 @@ const bundle = async () => {
           path.join(__dirname, 'dist', 'index.js')
         );
         await fse.copy(
+          path.join(__dirname, 'index.js'),
+          path.join(__dirname, 'dist', 'index.d.ts')
+        );
+        await fse.copy(
+          path.join(__dirname, 'index.js'),
+          path.join(__dirname, 'dist', 'index.js.map')
+        );
+        await fse.copy(
           path.join(__dirname, 'public'),
           path.join(__dirname, 'dist', 'public')
         );
@@ -193,7 +201,7 @@ const publish = async () => {
       `Please remove "${path.join(__dirname, 'dist', 'node_modules')}"`
     );
   }
-  await spawn('npm', ['publish', '--access=restricted'], {
+  await spawn('npm', ['publish', '--access=public'], {
     cwd: path.join(process.cwd(), 'dist'),
     stdio: 'inherit',
   });

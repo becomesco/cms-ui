@@ -367,7 +367,7 @@
         }
       );
       languages.forEach((lng) => {
-        if (entry.content[lng.code][1].value[0] !== '') {
+        if (entry.meta[lng.code][1].value[0] !== '') {
           autoFillSlug[lng.code] = false;
         }
       });

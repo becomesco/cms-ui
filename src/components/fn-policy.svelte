@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { beforeUpdate, createEventDispatcher } from 'svelte';
   import type { APIFunction } from '@becomes/cms-sdk';
   import { CheckboxInput } from './input';
 
@@ -11,17 +11,25 @@
     public: false,
   };
 
-  const dispatch = createEventDispatcher();
-  let className = '';
-  let data: APIFunction & {
+  type Data = APIFunction & {
     checked: boolean;
     disabled: boolean;
-  } = {
-    _id: initialValue._id ? '' + initialValue._id : '',
-    public: initialValue.public ? true : false,
-    checked: initialValue.public ? true : checked ? true : false,
-    disabled: initialValue.public ? true : false,
   };
+
+  const dispatch = createEventDispatcher();
+  let className = '';
+  let data: Data = getData();
+  function getData(): Data {
+    return {
+      _id: initialValue._id ? '' + initialValue._id : '',
+      public: initialValue.public ? true : false,
+      checked: initialValue.public ? true : checked ? true : false,
+      disabled: initialValue.public ? true : false,
+    };
+  }
+  beforeUpdate(() => {
+    data = getData();
+  });
 </script>
 
 <div class="fn-policy {data.disabled ? 'fn-policy--disabled' : ''} {className}">
