@@ -1,8 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher, afterUpdate } from 'svelte';
-  import { StoreService } from '../../services';
+  import { GeneralService, StoreService } from '../../services';
   import Modal from './modal.svelte';
-  import { ToggleInput, TextInput } from '../input';
+  import { ToggleInput, TextInput, MultiAddInput } from '../input';
   import { Prop, PropType } from '@becomes/cms-sdk';
 
   export let prop: Prop = {
@@ -25,6 +25,7 @@
       error: '',
     },
     required: prop.required ? true : false,
+    value: prop.value ? prop.value : {},
   };
 
   function close() {
@@ -36,6 +37,7 @@
           error: '',
         },
         required: false,
+        value: {},
       };
       buffer = {
         name: '',
@@ -68,6 +70,7 @@
           error: '',
         },
         required: prop.required ? true : false,
+        value: prop.value,
       };
     }
   });
@@ -81,6 +84,23 @@
     on:input={(event) => {
       data.label.value = event.detail;
     }} />
+  {#if prop.type === PropType.ENUMERATION}
+    <MultiAddInput
+      class="mt--20 mb--20"
+      label="Enumerations"
+      helperText="Type some value and press Enter key to add it."
+      value={prop.value.items}
+      formater={(value) => {
+        return GeneralService.string.toEnum(value);
+      }}
+      validate={(items) => {
+        if (items
+            .splice(0, items.length - 1)
+            .includes(items[items.length - 1])) {
+          return `Enumeration with name "${items[items.length - 1]}" is already added.`;
+        }
+      }} />
+  {/if}
   <ToggleInput
     label="Required"
     value={data.required}

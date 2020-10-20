@@ -58,6 +58,7 @@
     progress: 0,
     filename: '',
   };
+  let openMediaSpinner = false;
   const filesCount = 12;
   let showFilesCount = 0 + filesCount;
 
@@ -126,7 +127,10 @@
         if (cached) {
           return { fromCache: true, b64: cached.b64 };
         }
-        return { fromCache: false, b64: await sdk.media.getBinary(media._id, 'small') };
+        return {
+          fromCache: false,
+          b64: await sdk.media.getBinary(media._id, 'small'),
+        };
       },
       async (data: { fromCache: boolean; b64: string | Buffer }) => {
         let b64: string;
@@ -217,11 +221,23 @@
   function showMoreFiles() {
     showFilesCount = showFilesCount + filesCount;
   }
-  function openMedia(media: MediaAggregate) {
-    const cached = cache.find((e) => e.id === media._id);
-    if (cached) {
-      window.open(`data:${media.mimetype};base64,${cached.b64}`, '_blank');
+  async function openMedia(media: MediaAggregate) {
+    openMediaSpinner = true;
+    const bin = await GeneralService.errorWrapper(
+      async () => {
+        return await sdk.media.getBinary(media._id);
+      },
+      async (result: Buffer) => {
+        return result;
+      }
+    );
+    if (bin) {
+      window.open(
+        `data:${media.mimetype};base64,${GeneralService.b64.fromBuffer(bin)}`,
+        '_blank'
+      );
     }
+    openMediaSpinner = false;
   }
 
   onMount(async () => {
@@ -325,7 +341,7 @@
                         openMedia(media);
                       }
                     }}>
-                    <div class="fas fa-folder icon" />
+                    <div class="fas fa-file icon" />
                     <div class="name">
                       {GeneralService.string.toShort(media.name, 40)}
                     </div>
@@ -396,6 +412,7 @@
   on:done={(event) => {
     createFiles(event.detail.parentId, event.detail.name, event.detail.files);
   }} />
+<Spinner show={openMediaSpinner} />
 <Spinner show={uploadStatus.show}>
   <div class="media-viewer--upload-file-name">{uploadStatus.filename}</div>
   <ProgressBar class="ml--auto mr--auto" progress={uploadStatus.progress} />

@@ -3,7 +3,6 @@
   export let icon: string = '';
   export let onlyIcon: boolean = false;
   export let kind: 'primary' | 'secondary' | 'ghost' | 'danger' = 'primary';
-  export let size = undefined;
   export let style: string = undefined;
   export let disabled: boolean = false;
 
@@ -11,7 +10,7 @@
 </script>
 
 <button
-  class="{className} btn btn--{kind} btn--{size}"
+  class="{className} btn btn--{kind}"
   {style}
   {disabled}
   on:click>

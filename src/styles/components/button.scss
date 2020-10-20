@@ -56,4 +56,12 @@
 
 .btn:hover {
   cursor: pointer;
+  &:disabled {
+    cursor: not-allowed;
+    background: initial;
+  }
+}
+
+.btn:disabled {
+  opacity: 0.5;
 }

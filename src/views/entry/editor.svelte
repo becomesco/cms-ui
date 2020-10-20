@@ -371,7 +371,6 @@
           autoFillSlug[lng.code] = false;
         }
       });
-      console.log(entry);
     }
     errors = { meta: getErrorObject(template.props) };
   }
