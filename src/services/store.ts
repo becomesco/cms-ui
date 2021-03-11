@@ -66,31 +66,33 @@ function storeService(store: {
     },
     set<T extends { _id: string }>(name: string, value: T | T[]) {
       self.update(name, (store: T[]) => {
-        if (value instanceof Array) {
-          for (let i = 0; i < value.length; i++) {
+        if (value) {
+          if (value instanceof Array) {
+            for (let i = 0; i < value.length; i++) {
+              let found = false;
+              for (let j = 0; j < store.length; j++) {
+                if (store[j]._id === value[i]._id) {
+                  found = true;
+                  store[j] = value[i];
+                  break;
+                }
+              }
+              if (!found) {
+                store.push(value[i]);
+              }
+            }
+          } else {
             let found = false;
-            for (let j = 0; j < store.length; j++) {
-              if (store[j]._id === value[i]._id) {
+            for (let i = 0; i < store.length; i++) {
+              if (store[i]._id === value._id) {
+                store[i] = JSON.parse(JSON.stringify(value));
                 found = true;
-                store[j] = value[i];
                 break;
               }
             }
             if (!found) {
-              store.push(value[i]);
+              store.push(JSON.parse(JSON.stringify(value)));
             }
-          }
-        } else {
-          let found = false;
-          for (let i = 0; i < store.length; i++) {
-            if (store[i]._id === value._id) {
-              store[i] = value;
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            store.push(value);
           }
         }
         return store;

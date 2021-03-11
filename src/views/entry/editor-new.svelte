@@ -27,10 +27,12 @@
     'entry',
     async (store: EntryLite[]) => {
       if (store) {
+        console.log('s', store);
         if (params.entryId !== '-') {
-          entry = EntryUtil.toModified(
-            store.find((e) => e._id === params.entryId)
-          );
+          const target = store.find((e) => e && e._id === params.entryId);
+          if (target) {
+            entry = EntryUtil.toModified(target);
+          }
         }
       }
     }
@@ -87,7 +89,7 @@
         StoreService.set('language', value.languages);
         StoreService.set('template', value.template);
         if (value.entry) {
-          StoreService.set('entry', entry);
+          StoreService.set('entry', value.entry);
         } else {
           entry = EntryUtil.instanceModified(
             false,
