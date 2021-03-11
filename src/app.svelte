@@ -28,6 +28,7 @@
     EntryEditor,
     UserProfile,
     HistoryOverviewView,
+EntryEditorNew,
   } from './views';
   import { GeneralService } from './services';
 
@@ -105,6 +106,10 @@
                 path: '/:entryId',
                 component: EntryEditor,
               },
+              {
+                path: '/:entryId/new',
+                component: EntryEditorNew
+              }
             ],
           },
           {

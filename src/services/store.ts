@@ -20,6 +20,7 @@ type SocketEvent = {
 export type StoreServicePrototype = {
   create(name: string, value: any): void;
   update(name: string, value: any): void;
+  set<T extends { _id: string }>(name: string, value: T | T[]): void;
   subscribe(name: string, handler: (value: any) => Promise<void>): () => void;
   runUpdates(updates: SocketEventDataUpdate[]): Promise<void>;
 };
@@ -33,8 +34,8 @@ function storeService(store: {
       handler: (value: any) => Promise<void>;
     }>;
   };
-}): StoreServicePrototype {
-  return {
+}) {
+  const self: StoreServicePrototype = {
     create(name, value) {
       if (!store[name]) {
         store[name] = {
@@ -62,6 +63,38 @@ function storeService(store: {
       } else {
         store[name].w.update(() => value);
       }
+    },
+    set<T extends { _id: string }>(name: string, value: T | T[]) {
+      self.update(name, (store: T[]) => {
+        if (value instanceof Array) {
+          for (let i = 0; i < value.length; i++) {
+            let found = false;
+            for (let j = 0; j < store.length; j++) {
+              if (store[j]._id === value[i]._id) {
+                found = true;
+                store[j] = value[i];
+                break;
+              }
+            }
+            if (!found) {
+              store.push(value[i]);
+            }
+          }
+        } else {
+          let found = false;
+          for (let i = 0; i < store.length; i++) {
+            if (store[i]._id === value._id) {
+              store[i] = value;
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            store.push(value);
+          }
+        }
+        return store;
+      });
     },
     subscribe(name, handler) {
       if (!store[name]) {
@@ -110,6 +143,7 @@ function storeService(store: {
       }
     },
   };
+  return self;
 }
 
 export const StoreService = storeService({});
